@@ -196,7 +196,7 @@ export const createEmployee = async (req, res, next) => {
     const hashedPassword = await hashPassword(randomPassword);
 
     // Validate role (default to 'employee' if not provided or invalid)
-    const validRoles = ["admin", "hr", "payroll", "employee"];
+    const validRoles = ["admin", "hr", "employee"];
     const employeeRole =
       role && validRoles.includes(role.toLowerCase())
         ? role.toLowerCase()
@@ -275,10 +275,12 @@ export const createEmployee = async (req, res, next) => {
 
     const { user, employee } = result;
 
+    // employeeId IS the login ID - they are the same value
+    // Send email with the generated employeeId as the login ID
     try {
       await sendAccountCreationEmail(
         email,
-        employeeId,
+        employeeId, // This is the login ID (same as employeeId in database)
         randomPassword,
         firstName,
         resetToken
@@ -717,7 +719,7 @@ export const importEmployees = async (req, res, next) => {
         const hashedPassword = await hashPassword(randomPassword);
 
         // Validate role
-        const validRoles = ["admin", "hr", "payroll", "employee"];
+        const validRoles = ["admin", "hr", "employee"];
         const employeeRole =
           role && validRoles.includes(role.toLowerCase())
             ? role.toLowerCase()
@@ -895,11 +897,12 @@ export const importEmployees = async (req, res, next) => {
           },
         });
 
-        // Send account creation email (non-blocking)
+        // employeeId IS the login ID - they are the same value
+        // Send email with the generated employeeId as the login ID
         try {
           await sendAccountCreationEmail(
             email.toLowerCase(),
-            employeeId,
+            employeeId, // This is the login ID (same as employeeId in database)
             randomPassword,
             firstName,
             resetToken

@@ -46,7 +46,7 @@ export default function Attendance() {
   const [monthSummary, setMonthSummary] = useState(null)
   const [employeeSearchTerm, setEmployeeSearchTerm] = useState('')
 
-  const isAdmin = ['admin', 'hr', 'payroll'].includes(user?.role)
+  const isAdmin = ['admin', 'hr'].includes(user?.role)
 
   useEffect(() => {
     if (isAdmin) {
@@ -435,7 +435,7 @@ export default function Attendance() {
         /* Admin/HR/Payroll Officer View */
         <Card>
           <CardHeader>
-            <CardTitle>Attendances List view For Admin/HR Officer/Payroll Officer</CardTitle>
+            <CardTitle>Attendances List view For Admin/HR Officer</CardTitle>
             <CardDescription>
               View attendance of all employees for selected day or month
             </CardDescription>

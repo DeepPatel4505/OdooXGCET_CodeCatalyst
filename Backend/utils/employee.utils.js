@@ -32,6 +32,18 @@ export const generateCompanyCode = async (companyName) => {
 };
 
 
+/**
+ * Generates a unique Login ID for employees in the format:
+ * CompanyCode + First2LettersOfFirstName + First2LettersOfLastName + Year + SerialNumber
+ * 
+ * Example: OIJODO20220001
+ * - OI = Company Code (Odoo India)
+ * - JODO = First 2 letters of first name (JO) + First 2 letters of last name (DO)
+ * - 2022 = Year of Joining
+ * - 0001 = Serial Number of joining for that year
+ * 
+ * This Login ID is used for authentication and is sent to employees via email.
+ */
 export const generateEmployeeId = async (
   companyCode,
   firstName,
@@ -49,6 +61,7 @@ export const generateEmployeeId = async (
     throw new Error("Last name must be at least 2 characters long");
   }
 
+  // Extract first 2 letters of first name and last name
   const firstNameCode = firstName.substring(0, 2).toUpperCase();
   const lastNameCode = lastName.substring(0, 2).toUpperCase();
 

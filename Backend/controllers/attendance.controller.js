@@ -21,10 +21,9 @@ export const getAttendance = async (req, res, next) => {
       }
     } else if (
       user.role === "admin" ||
-      user.role === "hr" ||
-      user.role === "payroll"
+      user.role === "hr"
     ) {
-      // Admin, HR, and Payroll can see all employees from their company
+      // Admin and HR can see all employees from their company
       if (user.companyId) {
         const employees = await prisma.employee.findMany({
           where: { companyId: user.companyId },

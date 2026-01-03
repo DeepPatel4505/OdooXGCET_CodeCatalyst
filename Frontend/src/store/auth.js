@@ -12,11 +12,11 @@ const useAuthStore = create(
       isAuthenticated: false,
       isLoading: false,
 
-      login: async (email, password) => {
+      login: async (loginId, password) => {
         set({ isLoading: true })
         try {
           const response = await apiClient.post('/auth/login', {
-            email,
+            loginId,
             password,
           })
 

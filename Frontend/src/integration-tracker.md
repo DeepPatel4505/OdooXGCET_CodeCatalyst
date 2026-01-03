@@ -1,4 +1,4 @@
-# WorkZen HRMS - Backend Integration Tracker
+# Dayflow HRMS - Backend Integration Tracker
 
 **Version:** 1.0.0  
 **Last Updated:** 2024-01-15  
@@ -849,7 +849,7 @@ All endpoints should return consistent error responses:
 ## 📞 Contact
 
 For questions or issues regarding backend integration:
-- **Frontend Team:** WorkZen HRMS Frontend Team
-- **Backend Team:** WorkZen HRMS Backend Team
+- **Frontend Team:** Dayflow HRMS Frontend Team
+- **Backend Team:** Dayflow HRMS Backend Team
 - **Documentation:** See `src/backend-integration.json` for complete API contract
 

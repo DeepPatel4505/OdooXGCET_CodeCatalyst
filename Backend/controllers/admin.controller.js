@@ -88,14 +88,18 @@ export const sendCredentials = async (req, res, next) => {
       },
     })
 
+    // employeeId IS the login ID - they are the same value stored in the database
+    // The login ID format: CompanyCode + First2LettersOfFirstName + First2LettersOfLastName + Year + SerialNumber
+    // Example: OIJODO20220001
+    // For employees, employeeId is always present. For non-employee users (if any), fallback to email
     const loginId = user.employeeId || user.email
     
     try {
       await sendAccountCreationEmail(
         user.email,
         loginId,
-        '[Please reset your password using the link below]',
-        `${user.firstName} ${user.lastName}`,
+        'Your password has been reset. Please use the link below to set a new password.',
+        user.firstName,
         resetToken
       )
     } catch (emailError) {

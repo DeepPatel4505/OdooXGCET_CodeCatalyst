@@ -14,11 +14,26 @@ const prisma = new PrismaClient();
 
 export const login = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
-    const loginId = email;
+    const { loginId, password } = req.body;
 
-    let user = await prisma.user.findUnique({
-      where: { email: loginId },
+    if (!loginId || !password) {
+      return res.status(400).json({
+        status: "error",
+        message: "Login ID and password are required",
+        error: "Validation Error",
+      });
+    }
+
+    // Find user by either email or employeeId
+    // employeeId IS the login ID - they are the same value stored in the database
+    // Supports both login methods: email address or employeeId (login ID)
+    let user = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { email: loginId },
+          { employeeId: loginId }, // employeeId = login ID (same value)
+        ],
+      },
       include: {
         company: {
           select: {
@@ -32,25 +47,9 @@ export const login = async (req, res, next) => {
     });
 
     if (!user) {
-      user = await prisma.user.findUnique({
-        where: { employeeId: loginId },
-        include: {
-          company: {
-            select: {
-              id: true,
-              name: true,
-              code: true,
-              logo: true,
-            },
-          },
-        },
-      });
-    }
-
-    if (!user) {
       return res.status(401).json({
         status: "error",
-        message: "Invalid credentials",
+        message: "Invalid login ID or password",
         error: "Unauthorized",
       });
     }
@@ -59,7 +58,7 @@ export const login = async (req, res, next) => {
     if (!isValid) {
       return res.status(401).json({
         status: "error",
-        message: "Invalid credentials",
+        message: "Invalid login ID or password",
         error: "Unauthorized",
       });
     }
@@ -168,6 +167,19 @@ export const getMe = async (req, res, next) => {
 
 export const registerUser = async (req, res, next) => {
   try {
+    // Check if any companies already exist - registration is only allowed for initial setup
+    const existingCompanies = await prisma.company.findMany({
+      take: 1,
+    });
+
+    if (existingCompanies.length > 0) {
+      return res.status(403).json({
+        status: "error",
+        message: "Registration is disabled. Please contact your HR or Admin to create an account.",
+        error: "Forbidden",
+      });
+    }
+
     const { companyName, name, email, phone, password, companyLogo } = req.body;
 
     if (!companyName || companyName.length < 2) {
@@ -239,6 +251,8 @@ export const registerUser = async (req, res, next) => {
 
     const hireDate = new Date();
 
+    // Generate employeeId which IS the login ID (they are the same value)
+    // Format: CompanyCode + First2LettersOfFirstName + First2LettersOfLastName + Year + SerialNumber
     const employeeId = await generateEmployeeId(
       company.code,
       firstName,
@@ -249,6 +263,7 @@ export const registerUser = async (req, res, next) => {
 
     const hashedPassword = await hashPassword(password);
 
+    // Store employeeId in user table - this is the login ID
     const user = await prisma.user.create({
       data: {
         email,
@@ -259,7 +274,7 @@ export const registerUser = async (req, res, next) => {
         phone: phone || null,
         department: "General",
         position: "Owner",
-        employeeId,
+        employeeId, // This is the login ID (same value)
         companyId: company.id,
       },
       select: {
@@ -278,9 +293,10 @@ export const registerUser = async (req, res, next) => {
       },
     });
 
+    // Store employeeId in employee table - this is the login ID
     await prisma.employee.create({
       data: {
-        employeeId,
+        employeeId, // This is the login ID (same value)
         userId: user.id,
         email,
         firstName,

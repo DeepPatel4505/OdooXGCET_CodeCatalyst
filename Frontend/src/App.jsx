@@ -13,9 +13,6 @@ import Dashboard from "./pages/Dashboard";
 import Employees from "./pages/Employees";
 import Attendance from "./pages/Attendance";
 import Leaves from "./pages/Leaves";
-import Payroll from "./pages/Payroll";
-import Payslips from "./pages/Payslips";
-import PayslipDetail from "./pages/PayslipDetail";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
 import UserSettings from "./pages/UserSettings";
@@ -75,7 +72,7 @@ function App() {
             path="attendance"
             element={
               <ProtectedRoute
-                allowedRoles={["admin", "hr", "employee", "payroll"]}
+                allowedRoles={["admin", "hr", "employee"]}
               >
                 <Attendance />
               </ProtectedRoute>
@@ -85,30 +82,16 @@ function App() {
             path="leaves"
             element={
               <ProtectedRoute
-                allowedRoles={["admin", "hr", "employee", "payroll"]}
+                allowedRoles={["admin", "hr", "employee"]}
               >
                 <Leaves />
               </ProtectedRoute>
             }
           />
           <Route
-            path="payroll"
-            element={
-              <ProtectedRoute allowedRoles={["admin", "payroll"]}>
-                <Payroll />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="payslips" element={<Payslips />} />
-          <Route path="payslips/:payslipId" element={<PayslipDetail />} />
-          <Route
-            path="payslips/payroll/:payrollId"
-            element={<PayslipDetail />}
-          />
-          <Route
             path="reports"
             element={
-              <ProtectedRoute allowedRoles={["admin", "payroll"]}>
+              <ProtectedRoute allowedRoles={["admin"]}>
                 <Reports />
               </ProtectedRoute>
             }
@@ -119,7 +102,7 @@ function App() {
           <Route
             path="salary-management"
             element={
-              <ProtectedRoute allowedRoles={["admin", "hr", "payroll"]}>
+              <ProtectedRoute allowedRoles={["admin", "hr"]}>
                 <SalaryManagement />
               </ProtectedRoute>
             }

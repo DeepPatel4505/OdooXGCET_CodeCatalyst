@@ -13,8 +13,8 @@ router.post('/', authenticate, authorize('admin', 'hr'), validate(createEmployee
 router.put('/:employeeId', authenticate, authorize('admin', 'hr'), validate(updateEmployeeSchema), updateEmployee)
 router.post('/import', authenticate, authorize('admin', 'hr'), upload.single('file'), handleMulterError, importEmployees)
 router.get('/export', authenticate, authorize('admin', 'hr'), exportEmployees)
-router.get('/:employeeId/salary', authenticate, authorize('admin', 'hr', 'payroll'), getEmployeeSalary)
-router.put('/:employeeId/salary', authenticate, authorize('admin', 'hr', 'payroll'), updateEmployeeSalary)
+router.get('/:employeeId/salary', authenticate, authorize('admin', 'hr'), getEmployeeSalary)
+router.put('/:employeeId/salary', authenticate, authorize('admin', 'hr'), updateEmployeeSalary)
 
 export default router
 

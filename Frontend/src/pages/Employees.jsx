@@ -97,7 +97,7 @@ const employeeSchema = z.object({
   // allow strings from inputs; we'll coerce to number in onSubmit
   salary: z.union([z.number().min(0, "Salary must be positive"), z.string()]),
   hireDate: z.string().min(1, "Hire date is required"),
-  role: z.enum(["admin", "hr", "payroll", "employee"]).optional(),
+  role: z.enum(["admin", "hr", "employee"]).optional(),
 });
 
 export default function Employees() {
@@ -928,7 +928,6 @@ export default function Employees() {
                           <SelectItem value="employee">Employee</SelectItem>
                           <SelectItem value="hr">HR</SelectItem>
                           <SelectItem value="admin">Admin</SelectItem>
-                          <SelectItem value="payroll">Payroll</SelectItem>
                         </SelectContent>
                       </Select>
                       {errors.role && (
@@ -1138,7 +1137,7 @@ export default function Employees() {
                       {
                         title: "Salary Management",
                         description:
-                          "Automated salary calculations with structures, deductions, and payslip generation.",
+                          "Automated salary calculations with structures and deductions.",
                         icon: DollarSign,
                       },
                       {
@@ -1184,12 +1183,6 @@ export default function Employees() {
                         description:
                           "Submit and manage your leave requests with real-time status updates.",
                         icon: Calendar,
-                      },
-                      {
-                        title: "My Payslips",
-                        description:
-                          "Access and download your payslips with detailed salary breakdowns.",
-                        icon: DollarSign,
                       },
                       {
                         title: "Attendance Analytics",

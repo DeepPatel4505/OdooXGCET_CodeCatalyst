@@ -27,9 +27,17 @@ export const generatePasswordResetToken = () => {
   return crypto.randomBytes(32).toString("hex");
 };
 
+/**
+ * Sends account creation email with login credentials
+ * @param {string} email - User's email address
+ * @param {string} loginId - The login ID (this is the same as employeeId from database)
+ * @param {string} password - Auto-generated password
+ * @param {string} firstName - User's first name
+ * @param {string} resetToken - Password reset token for initial password change
+ */
 export const sendAccountCreationEmail = async (
   email,
-  loginId,
+  loginId, // loginId = employeeId (they are the same value)
   password,
   firstName,
   resetToken
@@ -58,13 +66,22 @@ export const sendAccountCreationEmail = async (
             <p>Hello ${firstName},</p>
             <p>Your account has been created successfully. Below are your login credentials:</p>
             
-            <div style="background-color: #ffffff; padding: 15px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #2563eb;">
-              <p style="margin: 5px 0;"><strong>Login ID:</strong> ${loginId}</p>
-              <p style="margin: 5px 0;"><strong>Email:</strong> ${email}</p>
-              <p style="margin: 5px 0;"><strong>Password:</strong> ${password}</p>
+            <div style="background-color: #ffffff; padding: 20px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #2563eb; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+              <p style="margin: 10px 0; font-size: 16px; color: #2563eb;"><strong>🔑 Your Login ID (Use this to sign in):</strong></p>
+              <p style="margin: 5px 0; font-size: 18px; font-weight: bold; color: #1e40af; background-color: #eff6ff; padding: 10px; border-radius: 4px; text-align: center; letter-spacing: 1px;">${loginId}</p>
+              <p style="margin: 15px 0 5px 0; font-size: 14px; color: #666;">You can also login using your email address: <strong>${email}</strong></p>
+              <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 15px 0;">
+              <p style="margin: 10px 0;"><strong>Email:</strong> ${email}</p>
+              <p style="margin: 10px 0;"><strong>Password:</strong> <code style="background-color: #f3f4f6; padding: 4px 8px; border-radius: 3px; font-family: monospace;">${password}</code></p>
             </div>
             
-            <p><strong>⚠️ Important:</strong> For security reasons, please change your password after your first login.</p>
+            <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 12px; border-radius: 4px; margin: 20px 0;">
+              <p style="margin: 0; color: #92400e;"><strong>⚠️ Important:</strong></p>
+              <ul style="margin: 8px 0 0 0; padding-left: 20px; color: #92400e;">
+                <li>You can login using your <strong>Login ID (${loginId})</strong> or your <strong>Email address</strong></li>
+                <li>For security reasons, please change your password after your first login</li>
+              </ul>
+            </div>
             
             <div style="text-align: center; margin: 30px 0;">
               <a href="${resetLink}" 
@@ -99,11 +116,19 @@ export const sendAccountCreationEmail = async (
         
         Your account has been created successfully. Below are your login credentials:
         
-        Login ID: ${loginId}
+        ========================================
+        YOUR LOGIN ID (Use this to sign in):
+        ${loginId}
+        ========================================
+        
+        You can also login using your email address: ${email}
+        
         Email: ${email}
         Password: ${password}
         
-        IMPORTANT: For security reasons, please change your password after your first login.
+        IMPORTANT:
+        - You can login using your Login ID (${loginId}) or your Email address
+        - For security reasons, please change your password after your first login
         
         Change Password: ${resetLink}
         

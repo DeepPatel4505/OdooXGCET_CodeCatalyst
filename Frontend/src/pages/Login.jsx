@@ -19,7 +19,7 @@ import PublicNavbar from "../components/PublicNavbar";
 import AnimatedShaderBackground from "../components/ui/animated-shader-background";
 
 const loginSchema = z.object({
-  email: z.string().min(1, "Login ID or Email is required"),
+  loginId: z.string().min(1, "Login ID or Email is required"),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
@@ -35,7 +35,7 @@ export default function Login() {
   });
 
   const onSubmit = async (data) => {
-    const success = await login(data.email, data.password);
+    const success = await login(data.loginId, data.password);
     if (success) {
       navigate("/dashboard");
     }
@@ -76,27 +76,27 @@ export default function Login() {
                 <CardContent>
                   <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="email">Login ID / Email</Label>
+                      <Label htmlFor="loginId">Login ID / Email</Label>
                       <Input
-                        id="email"
+                        id="loginId"
                         type="text"
-                        placeholder="Employee ID or Email "
-                        {...register("email")}
-                        aria-invalid={errors.email ? "true" : "false"}
+                        placeholder="e.g., OIJODO20220001 or user@example.com"
+                        {...register("loginId")}
+                        aria-invalid={errors.loginId ? "true" : "false"}
                         aria-describedby={
-                          errors.email ? "email-error" : undefined
+                          errors.loginId ? "loginId-error" : undefined
                         }
                       />
-                      {errors.email && (
+                      {errors.loginId && (
                         <p
-                          id="email-error"
+                          id="loginId-error"
                           className="text-sm text-destructive"
                         >
-                          {errors.email.message}
+                          {errors.loginId.message}
                         </p>
                       )}
                       <p className="text-xs text-muted-foreground">
-                        You can login with your Employee ID or Email address
+                        You can login with your Employee ID (e.g., OIJODO20220001) or Email address
                       </p>
                     </div>
 
@@ -139,16 +139,10 @@ export default function Login() {
                       {isLoading ? "Signing in..." : "Sign in"}
                     </Button>
 
-                    <div className="text-center text-sm">
-                      <span className="text-muted-foreground">
-                        Don't have an account?{" "}
-                      </span>
-                      <Link
-                        to="/register"
-                        className="text-primary hover:underline"
-                      >
-                        Register
-                      </Link>
+                    <div className="text-center text-sm text-muted-foreground">
+                      <p>
+                        Don't have an account? Please contact your HR or Admin to create one.
+                      </p>
                     </div>
                   </form>
                 </CardContent>
