@@ -4,8 +4,11 @@
 
 Team Members
 Krishnapal Singh Jadeja - Team Lead
+
 Vasu Kamani
+
 Pradeep Chandravadiya
+
 Deep Patel
 
 # Dayflow HRMS - Complete Human Resource Management System
@@ -18,5 +21,7 @@ Dayflow HRMS is a comprehensive solution for managing human resources operations
 
 ## Tech Stack
 Frontend: React, Vite, Tailwind CSS
+
 Backend: Node.js, Express.js, Prisma ORM
+
 Database: PostgreSQL
