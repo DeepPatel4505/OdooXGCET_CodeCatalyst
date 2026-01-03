@@ -35,7 +35,3 @@ Please refer to the respective README files for detailed setup instructions:
 
 - [Frontend Documentation](./Frontend/README.md)
 - [Backend Documentation](./Backend/README.md)
-
-## 📄 License
-
-This project is part of the Dayflow HRMS application.
