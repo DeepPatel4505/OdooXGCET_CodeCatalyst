@@ -1,0 +1,364 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+enum UserRole {
+  admin
+  hr
+  payroll
+  employee
+}
+
+enum EmployeeStatus {
+  active
+  inactive
+  terminated
+}
+
+enum AttendanceStatus {
+  present
+  absent
+  late
+  half_day
+}
+
+enum LeaveType {
+  sick
+  vacation
+  personal
+  unpaid
+}
+
+enum LeaveStatus {
+  pending
+  approved
+  rejected
+  cancelled
+}
+
+enum PayrunStatus {
+  draft
+  processing
+  completed
+  failed
+}
+
+enum PayrollStatus {
+  draft
+  computed
+  validated
+  cancelled
+}
+
+enum PayslipStatus {
+  draft
+  validated
+  printed
+  emailed
+}
+
+
+model Company {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  code      String   @unique // short code like 'WZ'
+  logo      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users     User[]
+  employees Employee[]
+
+  @@index([code])
+  @@index([name])
+}
+
+model User {
+  id          String   @id @default(uuid())
+  email       String   @unique
+  password    String
+  firstName   String
+  lastName    String
+  role        UserRole @default(employee)
+  avatar      String?
+  phone       String?
+  department  String?
+  position    String?
+  employeeId  String?  @unique
+  companyId   String?
+  company     Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  
+  // Resume fields
+  about              String?
+  whatILoveAboutMyJob String?
+  interestsAndHobbies String?
+  skills             String[] @default([])
+  certifications     String[] @default([])
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  
+  employee        Employee?
+  attendances    Attendance[]
+  leaves         Leave[]
+  approvedLeaves Leave[]        @relation("LeaveApprover")
+  payslips       Payslip[]
+  refreshTokens  RefreshToken[]
+  passwordResetTokens PasswordResetToken[]
+
+  @@index([email])
+  @@index([role])
+  @@index([companyId])
+}
+
+model Employee {
+  id         String         @id @default(uuid())
+  employeeId String         @unique
+  userId     String         @unique
+  email      String         @unique
+  firstName  String
+  lastName   String
+  avatar     String?
+  phone      String?
+  department String
+  position   String
+  status     EmployeeStatus @default(active)
+  hireDate   DateTime
+  salary     Float
+  companyId String?
+  company   Company?        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  
+  // Private info fields
+  dateOfBirth    DateTime?  @db.Date
+  address        String?
+  nationality    String?
+  personalEmail  String?
+  gender         String?
+  maritalStatus  String?
+  
+  // Bank details fields
+  accountNumber  String?
+  bankName       String?
+  ifscCode       String?
+  panNo          String?
+  uanNo          String?
+  
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+  
+
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  attendances      Attendance[]
+  leaves           Leave[]
+  salaryStructures SalaryStructure[]
+  payrolls         Payroll[]
+  payslips         Payslip[]
+
+  @@index([employeeId])
+  @@index([department])
+  @@index([status])
+  @@index([companyId])
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([userId])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  email     String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@index([email])
+}
+
+model Attendance {
+  id          String           @id @default(uuid())
+  employeeId  String
+  employee    Employee         @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date        DateTime         @db.Date
+  checkIn     DateTime?
+  checkOut    DateTime?
+  hoursWorked Float?
+  status      AttendanceStatus @default(absent)
+  notes       String?
+  createdAt   DateTime         @default(now())
+
+  @@unique([employeeId, date])
+  @@index([employeeId])
+  @@index([date])
+  @@index([userId])
+}
+
+model Leave {
+  id              String      @id @default(uuid())
+  employeeId      String
+  employee        Employee    @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  userId          String
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type            LeaveType
+  startDate       DateTime    @db.Date
+  endDate         DateTime    @db.Date
+  days            Int
+  reason          String
+  documentUrl     String?     // URL to uploaded document (for sick leave)
+  status          LeaveStatus @default(pending)
+  approvedById    String?
+  approvedBy      User?       @relation("LeaveApprover", fields: [approvedById], references: [id])
+  approvedAt      DateTime?
+  rejectionReason String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@index([employeeId])
+  @@index([userId])
+  @@index([status])
+  @@index([startDate, endDate])
+}
+
+model SalaryStructure {
+  id            String    @id @default(uuid())
+  employeeId    String
+  employee      Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  name          String
+  description   String?
+  effectiveFrom DateTime
+  effectiveTo   DateTime?
+
+  // General work info
+  monthWage          Float?  
+  yearlyWage         Float? 
+  workingDaysPerWeek Int?    
+  breakTime          Float? 
+
+  // earnings
+  basicSalary        Float @default(0)
+  basicSalaryPercent Float? 
+  houseRentAllowance Float @default(0)
+  hraPercent         Float? 
+  standardAllowance  Float @default(0)
+  standardAllowancePercent Float? 
+  performanceBonus   Float @default(0)
+  performanceBonusPercent Float? 
+  travelAllowance    Float @default(0)
+  ltaPercent         Float? 
+  fixedAllowance     Float @default(0)
+  fixedAllowancePercent Float? 
+
+  // deductions
+  pfEmployee      Float @default(0)
+  pfEmployeePercent Float? 
+  pfEmployer      Float @default(0)
+  pfEmployerPercent Float? 
+  professionalTax Float @default(0)
+  tds             Float @default(0)
+  otherDeductions Float @default(0)
+
+  // final amounts
+  grossSalary     Float @default(0)
+  totalDeductions Float @default(0)
+  netSalary       Float @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([employeeId])
+  @@index([effectiveFrom, effectiveTo])
+}
+
+model Payrun {
+  id             String       @id @default(uuid())
+  name           String
+  payPeriodStart DateTime     @db.Date
+  payPeriodEnd   DateTime     @db.Date
+  payDate        DateTime     @db.Date
+  status         PayrunStatus @default(draft)
+  totalEmployees Int          @default(0)
+  totalAmount    Float        @default(0)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  // Relations
+  payrolls Payroll[]
+
+  @@index([status])
+  @@index([payDate])
+}
+
+model Payroll {
+  id         String        @id @default(uuid())
+  employeeId String
+  employee   Employee      @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  payrunId   String
+  payrun     Payrun        @relation(fields: [payrunId], references: [id], onDelete: Cascade)
+  status     PayrollStatus @default(draft)
+
+  grossSalary     Float     @default(0)
+  totalDeductions Float     @default(0)
+  netSalary       Float     @default(0)
+  computedAt      DateTime?
+  validatedAt     DateTime?
+
+  // relations
+  payslip Payslip?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([employeeId, payrunId])
+  @@index([status])
+}
+
+model Payslip {
+  id         String   @id @default(uuid())
+  payrollId  String
+  payroll    Payroll  @relation(fields: [payrollId], references: [id], onDelete: Cascade)
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  pdfUrl     String?
+  status     PayslipStatus?  
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  user       User?    @relation(fields: [userId], references: [id])
+  userId     String?
+
+  @@unique([payrollId])
+  @@index([employeeId])
+}
+
+model PayrollSettings {
+  id            String   @id @default("default")
+  taxRate       Float    @default(18.5)
+  insuranceRate Float    @default(3.5)
+  payPeriodDays Int      @default(30)
+  updatedAt     DateTime @updatedAt
+
+  @@map("payroll_settings")
+}

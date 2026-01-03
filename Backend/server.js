@@ -3,6 +3,9 @@ import cors from "cors";
 import helmet from "helmet";
 import dotenv from "dotenv";
 
+// Import routes
+import authRoutes from "./routes/auth.routes.js";
+
 import { errorHandler } from "./middleware/error.middleware.js";
 
 dotenv.config();
@@ -30,7 +33,7 @@ app.get("/health", (req, res) => {
 });
 
 // API routes
-// app.use("/api/auth", authRoutes);
+app.use("/api/auth", authRoutes);
 
 // Error handling
 app.use(errorHandler);
