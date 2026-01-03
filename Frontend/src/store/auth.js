@@ -42,7 +42,7 @@ const useAuthStore = create(
 
       logout: async () => {
         try {
-          await apiClient.post('/auth/logout')
+          await apiClient.post('/auth/logout', {refreshToken: get().user?.refreshToken})
         } catch (error) {
           // Ignore logout errors
         } finally {

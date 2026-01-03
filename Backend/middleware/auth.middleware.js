@@ -19,7 +19,6 @@ export const authenticate = async (req, res, next) => {
     }
 
     const token = authHeader.substring(7); // Remove 'Bearer ' prefix
-   
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       const user = await prisma.user.findUnique({

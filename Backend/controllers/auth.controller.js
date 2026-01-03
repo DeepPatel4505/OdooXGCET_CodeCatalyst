@@ -70,7 +70,7 @@ export const login = async (req, res, next) => {
 
     // Store refresh token
     const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 7); // 7 days
+    expiresAt.setDate(expiresAt.getDate() + 7); 
 
     await prisma.refreshToken.create({
       data: {
