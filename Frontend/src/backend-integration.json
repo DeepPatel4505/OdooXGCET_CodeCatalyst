@@ -1,0 +1,823 @@
+{
+  "version": "1.0.0",
+  "baseUrl": "http://localhost:3000/api",
+  "endpoints": {
+    "auth": {
+      "login": {
+        "method": "POST",
+        "path": "/auth/login",
+        "description": "Authenticate user and get access token",
+        "request": {
+          "body": {
+            "email": "string (required)",
+            "password": "string (required)"
+          }
+        },
+        "response": {
+          "success": {
+            "status": 200,
+            "body": {
+              "accessToken": "string",
+              "refreshToken": "string",
+              "user": {
+                "id": "string",
+                "email": "string",
+                "firstName": "string",
+                "lastName": "string",
+                "role": "string (admin|hr|manager|employee)",
+                "avatar": "string|null",
+                "phone": "string|null",
+                "department": "string|null",
+                "position": "string|null",
+                "createdAt": "string (ISO 8601)",
+                "updatedAt": "string (ISO 8601)"
+              }
+            }
+          },
+          "error": {
+            "status": 401,
+            "body": {
+              "message": "string",
+              "error": "string"
+            }
+          }
+        }
+      },
+      "logout": {
+        "method": "POST",
+        "path": "/auth/logout",
+        "description": "Logout user and invalidate tokens",
+        "request": {
+          "headers": {
+            "Authorization": "Bearer {accessToken}"
+          }
+        },
+        "response": {
+          "success": {
+            "status": 200,
+            "body": {
+              "success": true
+            }
+          }
+        }
+      },
+      "refresh": {
+        "method": "POST",
+        "path": "/auth/refresh",
+        "description": "Refresh access token using refresh token",
+        "request": {
+          "body": {
+            "refreshToken": "string (required)"
+          }
+        },
+        "response": {
+          "success": {
+            "status": 200,
+            "body": {
+              "accessToken": "string"
+            }
+          },
+          "error": {
+            "status": 401,
+            "body": {
+              "message": "string"
+            }
+          }
+        }
+      },
+      "me": {
+        "method": "GET",
+        "path": "/auth/me",
+        "description": "Get current authenticated user",
+        "request": {
+          "headers": {
+            "Authorization": "Bearer {accessToken}"
+          }
+        },
+        "response": {
+          "success": {
+            "status": 200,
+            "body": {
+              "id": "string",
+              "email": "string",
+              "firstName": "string",
+              "lastName": "string",
+              "role": "string",
+              "avatar": "string|null",
+              "phone": "string|null",
+              "department": "string|null",
+              "position": "string|null",
+              "createdAt": "string",
+              "updatedAt": "string"
+            }
+          }
+        }
+      }
+    },
+    "dashboard": {
+      "stats": {
+        "method": "GET",
+        "path": "/dashboard/stats",
+        "description": "Get dashboard statistics",
+        "request": {
+          "headers": {
+            "Authorization": "Bearer {accessToken}"
+          }
+        },
+        "response": {
+          "success": {
+            "status": 200,
+            "body": {
+              "totalEmployees": "number",
+              "presentToday": "number",
+              "pendingLeaves": "number",
+              "lastPayrunAmount": "number",
+              "lastPayrunDate": "string (ISO 8601)|null"
+            }
+          }
+        }
+      }
+    },
+    "employees": {
+      "list": {
+        "method": "GET",
+        "path": "/employees",
+        "description": "Get list of all employees",
+        "request": {
+          "headers": {
+            "Authorization": "Bearer {accessToken}"
+          }
+        },
+        "response": {
+          "success": {
+            "status": 200,
+            "body": [
+              {
+                "id": "string",
+                "employeeId": "string",
+                "email": "string",
+                "firstName": "string",
+                "lastName": "string",
+                "avatar": "string|null",
+                "phone": "string|null",
+                "department": "string",
+                "position": "string",
+                "status": "string (active|inactive|terminated)",
+                "hireDate": "string (ISO 8601)",
+                "salary": "number",
+                "createdAt": "string",
+                "updatedAt": "string"
+              }
+            ]
+          }
+        }
+      },
+      "create": {
+        "method": "POST",
+        "path": "/employees",
+        "description": "Create a new employee",
+        "request": {
+          "headers": {
+            "Authorization": "Bearer {accessToken}"
+          },
+          "body": {
+            "firstName": "string (required)",
+            "lastName": "string (required)",
+            "email": "string (required, valid email)",
+            "phone": "string (optional)",
+            "department": "string (required)",
+            "position": "string (required)",
+            "salary": "number (required, >= 0)",
+            "hireDate": "string (required, ISO 8601)"
+          }
+        },
+        "response": {
+          "success": {
+            "status": 201,
+            "body": {
+              "id": "string",
+              "employeeId": "string",
+              "email": "string",
+              "firstName": "string",
+              "lastName": "string",
+              "department": "string",
+              "position": "string",
+              "status": "string",
+              "hireDate": "string",
+              "salary": "number",
+              "createdAt": "string",
+              "updatedAt": "string"
+            }
+          }
+        }
+      }
+    },
+    "attendance": {
+      "list": {
+        "method": "GET",
+        "path": "/attendance",
+        "description": "Get attendance records",
+        "request": {
+          "headers": {
+            "Authorization": "Bearer {accessToken}"
+          },
+          "query": {
+            "startDate": "string (optional, ISO 8601)",
+            "endDate": "string (optional, ISO 8601)",
+            "employeeId": "string (optional)"
+          }
+        },
+        "response": {
+          "success": {
+            "status": 200,
+            "body": [
+              {
+                "id": "string",
+                "employeeId": "string",
+                "employeeName": "string",
+                "date": "string (ISO 8601)",
+                "checkIn": "string (ISO 8601)|null",
+                "checkOut": "string (ISO 8601)|null",
+                "hoursWorked": "number|null",
+                "status": "string (present|absent|late|half-day)",
+                "notes": "string|null",
+                "createdAt": "string"
+              }
+            ]
+          }
+        }
+      },
+      "today": {
+        "method": "GET",
+        "path": "/attendance/today",
+        "description": "Get today's attendance for current user",
+        "request": {
+          "headers": {
+            "Authorization": "Bearer {accessToken}"
+          }
+        },
+        "response": {
+          "success": {
+            "status": 200,
+            "body": {
+              "id": "string",
+              "employeeId": "string",
+              "employeeName": "string",
+              "date": "string (ISO 8601)",
+              "checkIn": "string (ISO 8601)|null",
+              "checkOut": "string (ISO 8601)|null",
+              "hoursWorked": "number|null",
+              "status": "string",
+              "createdAt": "string"
+            }
+          },
+          "notFound": {
+            "status": 404,
+            "body": {
+              "message": "No attendance record found for today"
+            }
+          }
+        }
+      },
+      "checkIn": {
+        "method": "POST",
+        "path": "/attendance/check-in",
+        "description": "Mark check-in for today",
+        "request": {
+          "headers": {
+            "Authorization": "Bearer {accessToken}"
+          }
+        },
+        "response": {
+          "success": {
+            "status": 201,
+            "body": {
+              "id": "string",
+              "employeeId": "string",
+              "employeeName": "string",
+              "date": "string (ISO 8601)",
+              "checkIn": "string (ISO 8601)",
+              "status": "string",
+              "createdAt": "string"
+            }
+          }
+        }
+      },
+      "checkOut": {
+        "method": "POST",
+        "path": "/attendance/check-out",
+        "description": "Mark check-out for today",
+        "request": {
+          "headers": {
+            "Authorization": "Bearer {accessToken}"
+          }
+        },
+        "response": {
+          "success": {
+            "status": 200,
+            "body": {
+              "id": "string",
+              "employeeId": "string",
+              "employeeName": "string",
+              "date": "string (ISO 8601)",
+              "checkIn": "string (ISO 8601)",
+              "checkOut": "string (ISO 8601)",
+              "hoursWorked": "number",
+              "status": "string",
+              "createdAt": "string"
+            }
+          }
+        }
+      }
+    },
+    "leaves": {
+      "list": {
+        "method": "GET",
+        "path": "/leaves",
+        "description": "Get leave requests (filtered by user role)",
+        "request": {
+          "headers": {
+            "Authorization": "Bearer {accessToken}"
+          },
+          "query": {
+            "status": "string (optional, pending|approved|rejected)",
+            "employeeId": "string (optional)"
+          }
+        },
+        "response": {
+          "success": {
+            "status": 200,
+            "body": [
+              {
+                "id": "string",
+                "employeeId": "string",
+                "employeeName": "string",
+                "type": "string (sick|vacation|personal|unpaid)",
+                "startDate": "string (ISO 8601)",
+                "endDate": "string (ISO 8601)",
+                "days": "number",
+                "reason": "string",
+                "status": "string (pending|approved|rejected|cancelled)",
+                "approvedBy": "string|null",
+                "approvedAt": "string (ISO 8601)|null",
+                "rejectionReason": "string|null",
+                "createdAt": "string",
+                "updatedAt": "string"
+              }
+            ]
+          }
+        }
+      },
+      "create": {
+        "method": "POST",
+        "path": "/leaves",
+        "description": "Create a new leave request",
+        "request": {
+          "headers": {
+            "Authorization": "Bearer {accessToken}"
+          },
+          "body": {
+            "type": "string (required, sick|vacation|personal|unpaid)",
+            "startDate": "string (required, ISO 8601)",
+            "endDate": "string (required, ISO 8601)",
+            "days": "number (required, calculated)",
+            "reason": "string (required)"
+          }
+        },
+        "response": {
+          "success": {
+            "status": 201,
+            "body": {
+              "id": "string",
+              "employeeId": "string",
+              "employeeName": "string",
+              "type": "string",
+              "startDate": "string",
+              "endDate": "string",
+              "days": "number",
+              "reason": "string",
+              "status": "pending",
+              "createdAt": "string",
+              "updatedAt": "string"
+            }
+          }
+        }
+      },
+      "approve": {
+        "method": "PUT",
+        "path": "/leaves/{leaveId}/approve",
+        "description": "Approve a leave request (admin/hr/manager only)",
+        "request": {
+          "headers": {
+            "Authorization": "Bearer {accessToken}"
+          },
+          "pathParams": {
+            "leaveId": "string (required)"
+          }
+        },
+        "response": {
+          "success": {
+            "status": 200,
+            "body": {
+              "id": "string",
+              "status": "approved",
+              "approvedBy": "string",
+              "approvedAt": "string (ISO 8601)",
+              "updatedAt": "string"
+            }
+          }
+        }
+      },
+      "reject": {
+        "method": "PUT",
+        "path": "/leaves/{leaveId}/reject",
+        "description": "Reject a leave request (admin/hr/manager only)",
+        "request": {
+          "headers": {
+            "Authorization": "Bearer {accessToken}"
+          },
+          "pathParams": {
+            "leaveId": "string (required)"
+          },
+          "body": {
+            "rejectionReason": "string (optional)"
+          }
+        },
+        "response": {
+          "success": {
+            "status": 200,
+            "body": {
+              "id": "string",
+              "status": "rejected",
+              "rejectionReason": "string|null",
+              "updatedAt": "string"
+            }
+          }
+        }
+      }
+    },
+    "payroll": {
+      "listPayruns": {
+        "method": "GET",
+        "path": "/payroll/payruns",
+        "description": "Get list of all payruns",
+        "request": {
+          "headers": {
+            "Authorization": "Bearer {accessToken}"
+          }
+        },
+        "response": {
+          "success": {
+            "status": 200,
+            "body": [
+              {
+                "id": "string",
+                "name": "string",
+                "payPeriodStart": "string (ISO 8601)",
+                "payPeriodEnd": "string (ISO 8601)",
+                "payDate": "string (ISO 8601)",
+                "status": "string (draft|processing|completed|failed)",
+                "totalEmployees": "number",
+                "totalAmount": "number",
+                "createdAt": "string",
+                "updatedAt": "string"
+              }
+            ]
+          }
+        }
+      },
+      "createPayrun": {
+        "method": "POST",
+        "path": "/payroll/payruns",
+        "description": "Create a new payrun",
+        "request": {
+          "headers": {
+            "Authorization": "Bearer {accessToken}"
+          },
+          "body": {
+            "name": "string (required)",
+            "payPeriodStart": "string (required, ISO 8601)",
+            "payPeriodEnd": "string (required, ISO 8601)",
+            "payDate": "string (required, ISO 8601)"
+          }
+        },
+        "response": {
+          "success": {
+            "status": 201,
+            "body": {
+              "id": "string",
+              "name": "string",
+              "payPeriodStart": "string",
+              "payPeriodEnd": "string",
+              "payDate": "string",
+              "status": "draft",
+              "totalEmployees": 0,
+              "totalAmount": 0,
+              "createdAt": "string",
+              "updatedAt": "string"
+            }
+          }
+        }
+      },
+      "previewPayrun": {
+        "method": "GET",
+        "path": "/payroll/payruns/{payrunId}/preview",
+        "description": "Preview payrun with computed payslips",
+        "request": {
+          "headers": {
+            "Authorization": "Bearer {accessToken}"
+          },
+          "pathParams": {
+            "payrunId": "string (required)"
+          }
+        },
+        "response": {
+          "success": {
+            "status": 200,
+            "body": {
+              "id": "string",
+              "name": "string",
+              "payPeriodStart": "string",
+              "payPeriodEnd": "string",
+              "payDate": "string",
+              "status": "string",
+              "totalEmployees": "number",
+              "totalAmount": "number",
+              "payslips": [
+                {
+                  "id": "string",
+                  "employeeId": "string",
+                  "employeeName": "string",
+                  "grossPay": "number",
+                  "totalDeductions": "number",
+                  "netPay": "number"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "processPayrun": {
+        "method": "POST",
+        "path": "/payroll/payruns/{payrunId}/process",
+        "description": "Process a payrun (generate payslips)",
+        "request": {
+          "headers": {
+            "Authorization": "Bearer {accessToken}"
+          },
+          "pathParams": {
+            "payrunId": "string (required)"
+          }
+        },
+        "response": {
+          "success": {
+            "status": 200,
+            "body": {
+              "id": "string",
+              "status": "completed",
+              "totalEmployees": "number",
+              "totalAmount": "number",
+              "updatedAt": "string"
+            }
+          }
+        }
+      }
+    },
+    "payslips": {
+      "list": {
+        "method": "GET",
+        "path": "/payslips",
+        "description": "Get list of payslips (filtered by user role)",
+        "request": {
+          "headers": {
+            "Authorization": "Bearer {accessToken}"
+          },
+          "query": {
+            "payrunId": "string (optional)",
+            "employeeId": "string (optional)"
+          }
+        },
+        "response": {
+          "success": {
+            "status": 200,
+            "body": [
+              {
+                "id": "string",
+                "employeeId": "string",
+                "employeeName": "string",
+                "payrunId": "string",
+                "payPeriodStart": "string (ISO 8601)",
+                "payPeriodEnd": "string (ISO 8601)",
+                "payDate": "string (ISO 8601)",
+                "earnings": {
+                  "baseSalary": "number",
+                  "overtime": "number",
+                  "bonus": "number",
+                  "allowances": "number"
+                },
+                "deductions": {
+                  "tax": "number",
+                  "insurance": "number",
+                  "other": "number"
+                },
+                "grossPay": "number",
+                "totalDeductions": "number",
+                "netPay": "number",
+                "createdAt": "string"
+              }
+            ]
+          }
+        }
+      },
+      "get": {
+        "method": "GET",
+        "path": "/payslips/{payslipId}",
+        "description": "Get a specific payslip",
+        "request": {
+          "headers": {
+            "Authorization": "Bearer {accessToken}"
+          },
+          "pathParams": {
+            "payslipId": "string (required)"
+          }
+        },
+        "response": {
+          "success": {
+            "status": 200,
+            "body": {
+              "id": "string",
+              "employeeId": "string",
+              "employeeName": "string",
+              "payrunId": "string",
+              "payPeriodStart": "string",
+              "payPeriodEnd": "string",
+              "payDate": "string",
+              "earnings": {
+                "baseSalary": "number",
+                "overtime": "number",
+                "bonus": "number",
+                "allowances": "number"
+              },
+              "deductions": {
+                "tax": "number",
+                "insurance": "number",
+                "other": "number"
+              },
+              "grossPay": "number",
+              "totalDeductions": "number",
+              "netPay": "number",
+              "createdAt": "string"
+            }
+          }
+        }
+      },
+      "download": {
+        "method": "GET",
+        "path": "/payslips/{payslipId}/download",
+        "description": "Download payslip as PDF",
+        "request": {
+          "headers": {
+            "Authorization": "Bearer {accessToken}"
+          },
+          "pathParams": {
+            "payslipId": "string (required)"
+          }
+        },
+        "response": {
+          "success": {
+            "status": 200,
+            "body": "PDF file (binary)",
+            "headers": {
+              "Content-Type": "application/pdf",
+              "Content-Disposition": "attachment; filename=payslip-{payslipId}.pdf"
+            }
+          }
+        }
+      }
+    },
+    "settings": {
+      "get": {
+        "method": "GET",
+        "path": "/settings",
+        "description": "Get payroll settings (admin/hr only)",
+        "request": {
+          "headers": {
+            "Authorization": "Bearer {accessToken}"
+          }
+        },
+        "response": {
+          "success": {
+            "status": 200,
+            "body": {
+              "taxRate": "number",
+              "insuranceRate": "number",
+              "payPeriodDays": "number"
+            }
+          }
+        }
+      },
+      "update": {
+        "method": "PUT",
+        "path": "/settings",
+        "description": "Update payroll settings (admin/hr only)",
+        "request": {
+          "headers": {
+            "Authorization": "Bearer {accessToken}"
+          },
+          "body": {
+            "taxRate": "number (0-100)",
+            "insuranceRate": "number (0-100)",
+            "payPeriodDays": "number (1-31)"
+          }
+        },
+        "response": {
+          "success": {
+            "status": 200,
+            "body": {
+              "taxRate": "number",
+              "insuranceRate": "number",
+              "payPeriodDays": "number"
+            }
+          }
+        }
+      }
+    },
+    "profile": {
+      "update": {
+        "method": "PUT",
+        "path": "/profile",
+        "description": "Update user profile",
+        "request": {
+          "headers": {
+            "Authorization": "Bearer {accessToken}"
+          },
+          "body": {
+            "firstName": "string (required)",
+            "lastName": "string (required)",
+            "email": "string (required, valid email)",
+            "phone": "string (optional)"
+          }
+        },
+        "response": {
+          "success": {
+            "status": 200,
+            "body": {
+              "id": "string",
+              "email": "string",
+              "firstName": "string",
+              "lastName": "string",
+              "phone": "string|null",
+              "updatedAt": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  "authentication": {
+    "type": "JWT Bearer Token",
+    "header": "Authorization: Bearer {accessToken}",
+    "tokenRefresh": {
+      "endpoint": "/auth/refresh",
+      "method": "POST",
+      "body": {
+        "refreshToken": "string"
+      }
+    }
+  },
+  "errorResponses": {
+    "400": {
+      "status": 400,
+      "body": {
+        "message": "string",
+        "errors": "object (optional, validation errors)"
+      }
+    },
+    "401": {
+      "status": 401,
+      "body": {
+        "message": "Unauthorized",
+        "error": "string"
+      }
+    },
+    "403": {
+      "status": 403,
+      "body": {
+        "message": "Forbidden - Insufficient permissions"
+      }
+    },
+    "404": {
+      "status": 404,
+      "body": {
+        "message": "Resource not found"
+      }
+    },
+    "500": {
+      "status": 500,
+      "body": {
+        "message": "Internal server error"
+      }
+    }
+  }
+}
+
